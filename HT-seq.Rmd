@@ -1,0 +1,84 @@
+---
+title: "Analysis of HT-sequencing data from GEO database"
+author: "Taavi Päll, Tanel Tenson, Ülo Maiväli"
+date: '2017-04-27'
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align='center')
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(magrittr)
+library(reshape2)
+library(Biobase)
+library(ggthemes)
+library(gtable)
+library(grid)
+library(egg)
+```
+
+```{r libs}
+# Function to format numbers
+myround <- function(x, digits=1){
+    if(digits < 1)
+        stop("This is intended for the case digits >= 1.")
+
+    if(length(digits) > 1) {
+        digits <- digits[1]
+        warning("Using only digits[1]")
+    }
+
+    tmp <- sprintf(paste("%.", digits, "f", sep=""), x)
+
+    # deal with "-0.00" case
+    zero <- paste0("0.", paste(rep("0", digits), collapse=""))
+    tmp[tmp == paste0("-", zero)] <- zero
+
+    tmp
+}
+# Figure panel labels
+label <- lapply(LETTERS, textGrob, x = unit(0,"npc"), hjust = 0)
+```
+
+
+```{r munge-sparks}
+library(sparklines)
+library(formattable)
+load("data/sparklines2.RData")
+wrap_suppfile <- function(x, width = 50){
+  if(nchar(x) < width){return(x)}
+  
+  chrs <- unlist(strsplit(x, NULL))
+  nchrs <- length(chrs)
+  tosplit <- round(nchrs/width, 0)
+  
+  if(tosplit==1){ return(x)}
+  paste(c(paste(chrs[1:width], collapse = ""), paste(chrs[-(1:width)], collapse = "")), collapse="\n")
+}
+geolink <- "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc="
+p <-  data.frame(p, histograms = NA) %>% 
+  arrange(pi0, SRP) %>% 
+  rowwise() %>% 
+  mutate(countfiles = wrap_suppfile(countfiles, width = 40),
+         Accession = paste0("[",Accession,"](",geolink,Accession,")")) %>%
+  .[,c("Accession","countfiles","id","spark","histograms","SRP","pi0","rs","ud","fp")]
+```
+
+```{r plot-sparks}
+tab_coln <- c("Accession","Supplemental file","P values\norigin","P value\nhistogram","SRP", "pi0","Effects in\nreplication\nstudy","Undis\ncovered","FP")
+format_table(p, list(
+  spark = FALSE,
+  histograms = function(x) sapply(paste0(text = '`r p$spark[[', 1:nrow(p), ']]`'), function(md) knitr::knit(text = md, quiet = T)),
+  SRP = function(x) digits(x, digits = 2),
+  pi0 = function(x) digits(x, digits = 2),
+  rs = function(x) digits(x, digits = 0),
+  ud = function(x) digits(x, digits = 0),
+  fp = function(x) digits(x, digits = 0)),
+  align = c("l", "r", rep("l", 7)),
+  col.names = tab_coln,
+  caption = "Table 1. **P value histograms, estimated pi0, and stable retrospective power (SRP)**. P values are from likelihood ratio tests where full model formula was compared against intercept-only formula. SRP was calculated using FDR threshold of 0.05. pi0, the proportion of true null effects. FP, estimated number of false positives. NA, no effects (pi0 = 1), power calculation not meaningful. P value histogram coloring is based on unsupervised clustering of empirical cumulative distribution function values at histogram bins.")
+```
+

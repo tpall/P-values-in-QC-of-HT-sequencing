@@ -23,8 +23,6 @@ library(tidyverse)
 library(magrittr)
 library(lubridate)
 library(stringr)
-library(grid)
-library(gridExtra)
 library(ggthemes)
 ```
 
@@ -421,7 +419,7 @@ ggplot(dims, aes(samples, features)) +
 ]
 
 .footnone[
-Summary table, threshold of 8000 rows/features was used. Features are transcripts, genomic locuses, etc. GEO series with ~ 1000 samples are single-cell sequencing experiments.
+Summary table, threshold of 8000 rows/features was used to calculate mean and median. Features are transcripts, genomic locuses, etc. GEO series with ~ 1000 samples are single-cell sequencing experiments.
 ]
 
 ---
@@ -532,12 +530,21 @@ Images: left, varianceexplained.org; right, Scafolk Council.
 
 ---
 
-### Results
+class: inverse, center, middle
+
+# Results
+
+---
+
+### P value histograms, estimated pi0, and stable retrospective power
 
 ![SRP table](figs/SRP-table.png)
-...
 
-[SRP](HT-seq.html)
+[Click for full table](HT-seq.html)
+
+.footnote[
+P values are from likelihood ratio tests where full model formula was compared against intercept-only formula.
+]
 
 ---
 
@@ -582,10 +589,7 @@ p %>%
 
 - Ülo Maiväli and Tanel Tenson, _Institute of Technology, University of Tartu_
 
-
-
 .footnote[
 email: taavi.pall@ttu.ee
 ]
-
 

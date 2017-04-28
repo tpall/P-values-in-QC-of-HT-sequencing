@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>P-values in quality control of high-throughput experiments</title>
+    <meta charset="utf-8">
+    <meta name="date" content="2017-04-27" />
+    <link rel="stylesheet" href="bc.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# P-values in quality control of high-throughput experiments
+### <p>Taavi Päll<br />
+PhD, lecturer<br />
+Institute of Chemistry and Biotechnology<br />
+Tallinn University of Technology<br />
+<a href="mailto:taavi.pall@ttu.ee">taavi.pall@ttu.ee</a></p>
+### 2017-04-27
+
+---
+
+
+
+
+
+class: inverse, center, middle
+
+# Introduction
+
+---
+
+### Poor reproducibility and replicability have become major concerns in experimental biomedical science
+
+![Reproducibility project](http://www.sciencemag.org/sites/default/files/styles/inline__699w__no_aspect/public/gg_70120NiD_CitationSankey_15245D6373E_2653219%3B3.png?itok=2OqRrpm3)
+
+.footnote[
+Image: [Rigorous replication effort succeeds for just two of five cancer papers](http://www.sciencemag.org/news/2017/01/rigorous-replication-effort-succeeds-just-two-five-cancer-papers)
+]
+
+---
+
+### Reproducibility vs replication
+
+- Reproducibility is the ability of reproducing, by using the original data, the original data analysis exactly
+    - Reproducibility does not guarantee validity
+- Replicability is the ability of reproducing, by new experiments, the original data approximately
+    - Direct replication
+    - Conceptual replication
+
+.pull-left[
+&lt;center&gt;&lt;img src="http://www.mlslighting.co.uk/wp/wp-content/uploads/2015/02/lighting-calculation-1000.jpg" alt="reproduction" height="120"&gt;&lt;/center&gt;
+]
+
+.pull-right[
+&lt;center&gt;&lt;img src="http://www.artel-usa.com/wp-content/uploads/2013/09/pipetting-technique-1.jpg" alt="replication" height="120"&gt;&lt;/center&gt;
+]
+
+.footnote[
+Brian A Nosek, Timothy M Errington ["Reproducibility in cancer biology: Making sense of replications"](https://elife.elifesciences.org/content/6/e23383)
+]
+
+???
+
+- Poor reproducibility (the inability of reproducing, by using the original data, the original data analysis exactly) and 
+- replicability (the inability of reproducing, by new experiments, the original data approximately) have become major concerns in experimental biomedical science.
+
+---
+
+### What is the quality of a study?
+
+- Whether it's worthwhile to replicate a study involves asking questions about the quality of this study
+- The potential usefulness and feasibility of a replication study can be estimated from the results of the original study
+- Standard approach -- The null hypothesis significance testing, deals with the quality of the experimental system in the long run rather than of the quality of a particular experiment, making it difficult to answer such questions
+
+---
+
+### The null hypothesis significance testing (NHST) is for long run quality control
+
+- NHST controls specificity and sensitivity of the experimental system in the long-run
+- Specificity `\((\alpha)\)` is the false positive rate
+- Sensitivity `\((1-\beta)\)` is the statistical power of the test
+
+&lt;center&gt;&lt;img src="figs/nhst-explained.png" height="320"&gt;&lt;/center&gt;
+
+---
+
+### Statistical power
+
+- Power equals the number of true effects (Ha) in the non-null bin divided by the number of true effects in both bins
+- When testing a single H0, which happens to be true, we cannot make any inference from the resultant P value, which by itself carries no useful information 
+- On the other hand, when the H0 is not true and our study is adequately powered, then the P value is likely to be close to zero
+&gt; If we perform experiment with predetermined statistical power, then small P value makes H0 less likely
+
+&lt;img src="index_files/figure-html/phistogram-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+???
+
+- However, estimating statistical power can be biased 
+- Firstly, using meta-analysis of prior publications to determine the SD and ES for a prospective power study is likely to over-estimate the power 
+- because studies, whose ES happen to be inflated by sampling error or bias, tend to seem more interesting and are thus more likely to be published than the studies that happen to underestimate the ES (or even those that get their effects right) 
+- Such publication bias is pervasive in the biomedical literature
+
+---
+
+### Proportion of true nulls can be estimated using the flat part of P value histogram
+
+- `\(\pi0\)` is the proportion of true null hypotheses
+- The q-value of a test is the proportion of false positives incurred when that particular test is called significant&lt;sup&gt;1&lt;/sup&gt;
+
+&lt;img src="index_files/figure-html/qvalues-1.svg" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+[1] Q-value estimation for false discovery rate control [qvalue package](http://bioconductor.org/packages/release/bioc/html/qvalue.html) from bioconductor.org.
+]
+
+---
+
+### Statistical power cannot be estimated after the experiment 
+
+&lt;img src="index_files/figure-html/post-hoc-power-1.svg" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+- Because of random sampling post hoc statistical power is uncertain
+]
+
+---
+
+class: inverse, center, middle
+
+# From prospective to retrospective quality control
+
+---
+
+### Omics studies produce large numbers of P values from one study
+
+- In omics we study the responses of many mRNAs/proteins to the experimental condition, resulting in as many distinct P values 
+- These experiments are designed using the assumption that the relative levels of most mRNAs/proteins do not change upon experimental treatment
+
+---
+
+### Stable retrospective power (SRP)
+
+- In the context of __many parallel measurements__ it is possible to assess the quality of a single experiment
+- SRP is the fraction of statistically significant true discoveries from all true discoveries (significant or not)
+
+$$ SRP = \frac{(1-FDR)\times d}{(1-\pi0)\times k}$$
+&gt; SRP can be calculated wherever there is a large family of parallel tests and FDR, `\(\pi0\)`, and q values are calculated
+
+.footnote[
+FDR, false discovery rate. d, number of detected effects. `\(\pi0\)` the proportion of true null effects. k, number of total tests. R package to calculate SRP [devtools::install_github("tpall/SRP")](https://github.com/tpall/SRP)
+]
+
+???
+
+- SRP can be calculated wherever there is a large family of parallel tests and FDR, `\(\pi0\)`, and q values are calculated
+
+---
+
+### Difference between SRP and conventional statistical power
+
+- SRP combines the information present in a single test with the prior probability of the H0 (the `\(\pi0\)`), which is estimated laterally across hundreds or thousands of P values 
+- While traditional prospective power is used to set the sensitivity of the experimental system in the context of many consecutive measurements 
+&gt; SRP is used in the context of many parallel measurements to assess the quality of a single experiment
+
+---
+
+### SRP of statistical tests simulated with known power
+
+&lt;img src="index_files/figure-html/unnamed-chunk-1-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+
+
+
+
+---
+
+class: inverse, center, middle
+
+# Let's give SRP a field test
+
+---
+
+### The GEO database
+
+- GEO accepts next generation sequence data that examine quantitative gene expression, gene regulation, epigenomics or other aspects of functional genomics using methods such as RNA-seq, miRNA-seq, ChIP-seq, RIP-seq, HiC-seq, methyl-seq, etc
+
+&lt;img src="index_files/figure-html/geo-dynamics-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Query
+
+&gt; 'expression profiling by high throughput sequencing[DataSet Type] AND ("Homo sapiens"[Organism] OR "Mus musculus"[Organism])'
+
+- query retrieved 8670 GEO Series (Apr-24, 2017)
+
+![query](figs/GEO-query.png)
+
+
+---
+
+### Supplemental files
+
+```r
+suppfilenames &lt;- ds %&gt;%
+*   filter(PDAT&gt;"2015/12/24", PDAT&lt;"2017/03/31",
+         !inherits(SuppFileNames, "try-error"))
+
+*   out &lt;- c("tar","gtf","bed","bigbed","bedgraph","bw","wig","hic","gct(x)?","tdf",
+*         "gff","pdf","png","zip","sif","narrowpeak","gff3","fa")
+
+suppfiles_of_interest &lt;- suppfilenames %&gt;%
+  unnest(SuppFileNames) %&gt;%
+*  filter(!str_detect(tolower(SuppFileNames),
+*  "filelist|error|readme|annotation|raw.tar$|[:punct:]hic|hdf5$"),
+         !str_detect(tolower(SuppFileNames), paste0(out, "(\\.gz)?$", collapse = "|")))
+```
+
+- GEO Series published between Dec-24 2015 and Mar-31 2017
+- Keep only tables
+- Try to exclude single cell seq experiments (some will sneak through, as scientists are really inventive in file (mis)labeling), Chr-IP peak files, pdf, png, readmes etc.
+
+---
+
+### GEO Series with (potentially interesting) supplemental files
+
+&lt;img src="index_files/figure-html/suppfilesofinterest-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Number of samples and features in high-throughput sequencing experiments
+
+.pull-left[
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; stat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; features &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; samples &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; mean &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65051 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; median &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25546 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+
+.pull-right[
+&lt;img src="index_files/figure-html/samples-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.footnone[
+Summary table, threshold of 8000 rows/features was used to calculate mean and median. Features are transcripts, genomic locuses, etc. GEO series with ~ 1000 samples are single-cell sequencing experiments.
+]
+
+---
+
+### We were looking for supplemental files including tables with:
+
+1. raw P values
+2. raw sequence read counts
+
+&lt;img src="index_files/figure-html/pvalues-1.svg" style="display: block; margin: auto;" /&gt;
+
+.footnone[
+Threshold of 8000 was used to identify full expressome P values sets.
+]
+
+---
+
+### GEO Series with raw sequence read counts
+
+
+```r
+esets &lt;- tabs %&gt;% filter(map_chr(result, ~class(.x)[1])=="ExpressionSet")
+esets
+```
+
+```
+## # A tibble: 102 × 4
+##    Accession                                       countfiles       PDAT
+##        &lt;chr&gt;                                            &lt;chr&gt;      &lt;chr&gt;
+## 1   GSE52260                     GSE52260_rc_human_lncrna.txt 2016/04/07
+## 2   GSE52260                    GSE52260_rc_human_samples.txt 2016/04/07
+## 3   GSE61529     GSE61529_transcript_counts-2014-09-16.txt.gz 2017/01/06
+## 4   GSE65884                          GSE65884_Raw_counts.txt 2016/04/22
+## 5   GSE66993                     GSE66993_mRNA_All_Counts.xls 2016/03/17
+## 6   GSE67528 GSE67528_Processed_data_htseqcount_83samples.txt 2016/07/10
+## 7   GSE67892                   GSE67892_ReadCounts_RNAseq.txt 2016/06/28
+## 8   GSE68822            GSE68822_read_counts_matrix_table.tsv 2016/05/12
+## 9   GSE68958                      GSE68958_PreMegE_Counts.txt 2016/01/04
+## 10  GSE69652                                 GSE69652_raw.txt 2016/03/09
+## # ... with 92 more rows, and 1 more variables: result &lt;list&gt;
+```
+
+96 unique GEO Series
+
+---
+
+### Fit models
+
+
+```r
+# Identify vars for model fitting
+esets %&lt;&gt;% mutate(groups = map(result, ~get_model_eset(pData(.x))))
+library(edgeR); library(tidyverse); library(magrittr)
+esets %&lt;&gt;% filter(map_lgl(result, ~nrow(exprs(.x))&gt;8000)) %&gt;%
+  mutate(dge = pmap(list(result, groups, countfiles),
+    function(x,y,z) {message(z); DGEList(counts=exprs(x), samples = y, genes = fData(x))})) %&gt;%
+  filter(!map_lgl(groups, is.null))
+# Make design formulas and model.matrix
+make_formula &lt;- . %&gt;% colnames %&gt;% paste(collapse="+") %&gt;% paste("~",.) %&gt;% formula()
+esets %&lt;&gt;% mutate(design = map(groups, make_formula))
+esets %&lt;&gt;% mutate(design = map2(design, groups, ~model.matrix(object=.x, data=.y)))
+# Filter genes with low counts: 3 or more samples with cpm of 10/L. L, # millions of counts in the smallest library
+esets %&lt;&gt;% mutate(keep = map(dge, ~rowSums(cpm(.x)&gt;10/min(.x$samples$lib.size)/1e6) &gt;= 3),
+                  dge_filt = map2(dge, keep, ~.x[.y,]))
+# Recalculate library sizes and calculate normalisation factors
+esets %&lt;&gt;% mutate(dge_filt = map(dge_filt, ~{.x$samples$lib.size &lt;- colSums(.x$counts); .x}))
+esets %&lt;&gt;% mutate(dge_filt = map2(countfiles, dge_filt, ~{message(.x); calcNormFactors(.y)}))
+esets %&lt;&gt;% mutate(dge_filt = pmap(list(dge_filt, design, countfiles),
+                                  function(x,y,z) {message(z); try(estimateDisp(x,y))}))
+# Fit models
+esets %&lt;&gt;% filter(!map_lgl(dge_filt, ~inherits(.x, "try-error"))) %&gt;%
+  mutate(fit = pmap(list(dge_filt, design, countfiles), function(x,y,z) {message(z); try(glmFit(x,y))})) %&gt;%
+  filter(!map_lgl(fit, ~inherits(.x, "try-error"))) %&gt;%
+  mutate(results = map(fit, ~glmLRT(.x, coef=2:ncol(.x$design))),
+         toptags = map(results, topTags, n=Inf))
+```
+
+---
+
+### Interpreting P value histograms
+
+.pull-left[
+- Make a histogram of your P values
+- Look closely at your P value histograms as a first step in quality control
+&gt; Do this before you perform multiple hypothesis test correction, false discovery rate control, or any other means of interpreting your many P values&lt;sup&gt;1&lt;/sup&gt;
+]
+
+.pull-right[
+&lt;img alt="good and bad P value histograms"  src="http://varianceexplained.org/figs/2014-12-15-interpreting-pvalue-histogram/plot_melted-1.png" height="420"&gt;
+]
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;How to interpret a P value histogram: [http://varianceexplained.org/statistics/interpreting-pvalue-histogram](http://varianceexplained.org/statistics/interpreting-pvalue-histogram/)
+]
+
+???
+
+- P value histogram lets you get an immediate sense of how your test behaved across all your hypotheses, and immediately diagnose some potential problems
+
+---
+
+### Be careful with pathological cases
+
+.pull-left[
+Big bump in the middle? Bunch of random peaks? 
+![weird](http://varianceexplained.org/figs/2014-12-15-interpreting-pvalue-histogram/weird_pvalues-1.png)
+]
+
+.pull-right[
+&lt;img src="https://1.bp.blogspot.com/-ff59ebmURDE/UYyLvQUURGI/AAAAAAAABXc/z7OWx8Mus5Q/s1600/don%27twww-scarfolk-blogspot-com.jpg" height="420"&gt;
+]
+
+.footnote[
+Images: left, varianceexplained.org; right, Scafolk Council.
+]
+
+---
+
+class: inverse, center, middle
+
+# Results
+
+---
+
+### P value histograms, estimated pi0, and stable retrospective power
+
+![SRP table](figs/SRP-table.png)
+
+[Click for full table](HT-seq.html)
+
+.footnote[
+P values are from likelihood ratio tests where full model formula was compared against intercept-only formula.
+]
+
+---
+
+### SRP versus proportion of true nulls
+
+&lt;img src="index_files/figure-html/srp-scatterplot-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### SRP versus library size
+
+&lt;img src="index_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### Acknowledgements
+
+- Ülo Maiväli and Tanel Tenson, _Institute of Technology, University of Tartu_
+
+
+
+.footnote[
+email: taavi.pall@ttu.ee
+]
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLines": true
+});
+if (window.HTMLWidgets) slideshow.on('showSlide', function (slide) {setTimeout(function() {window.dispatchEvent(new Event('resize'));}, 100)});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
