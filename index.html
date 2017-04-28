@@ -168,15 +168,7 @@ FDR, false discovery rate. d, number of detected effects. `\(\pi0\)` the proport
 
 ### SRP of statistical tests simulated with known power
 
-&lt;img src="index_files/figure-html/unnamed-chunk-1-1.svg" style="display: block; margin: auto;" /&gt;
-
-
-
-
-
-
-
-
+&lt;img src="index_files/figure-html/srp-simu-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -287,28 +279,7 @@ Threshold of 8000 was used to identify full expressome P values sets.
 
 ### GEO Series with raw sequence read counts
 
-
-```r
-esets &lt;- tabs %&gt;% filter(map_chr(result, ~class(.x)[1])=="ExpressionSet")
-esets
-```
-
-```
-## # A tibble: 102 × 4
-##    Accession                                       countfiles       PDAT
-##        &lt;chr&gt;                                            &lt;chr&gt;      &lt;chr&gt;
-## 1   GSE52260                     GSE52260_rc_human_lncrna.txt 2016/04/07
-## 2   GSE52260                    GSE52260_rc_human_samples.txt 2016/04/07
-## 3   GSE61529     GSE61529_transcript_counts-2014-09-16.txt.gz 2017/01/06
-## 4   GSE65884                          GSE65884_Raw_counts.txt 2016/04/22
-## 5   GSE66993                     GSE66993_mRNA_All_Counts.xls 2016/03/17
-## 6   GSE67528 GSE67528_Processed_data_htseqcount_83samples.txt 2016/07/10
-## 7   GSE67892                   GSE67892_ReadCounts_RNAseq.txt 2016/06/28
-## 8   GSE68822            GSE68822_read_counts_matrix_table.tsv 2016/05/12
-## 9   GSE68958                      GSE68958_PreMegE_Counts.txt 2016/01/04
-## 10  GSE69652                                 GSE69652_raw.txt 2016/03/09
-## # ... with 92 more rows, and 1 more variables: result &lt;list&gt;
-```
+![esets](figs/esets.png)
 
 96 unique GEO Series
 
@@ -413,7 +384,7 @@ P values are from likelihood ratio tests where full model formula was compared a
 
 ### SRP versus library size
 
-&lt;img src="index_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/srp-libsize-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -421,8 +392,6 @@ P values are from likelihood ratio tests where full model formula was compared a
 ### Acknowledgements
 
 - Ülo Maiväli and Tanel Tenson, _Institute of Technology, University of Tartu_
-
-
 
 .footnote[
 email: taavi.pall@ttu.ee

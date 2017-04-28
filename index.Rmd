@@ -151,8 +151,7 @@ p + scale_linetype_discrete(guide=FALSE) +
 
 ```{r post-hoc-power, fig.height=4, fig.width=6}
 load("data/post-hoc-power.RData")
-guesses %>% 
-  select(-x, -pwr) %>% 
+guesses %<>% 
   gather(variable, value, -n, -true.power) %>%
   ggplot(aes(x = true.power, y = value, color = variable)) +
   geom_point() +
@@ -214,7 +213,7 @@ FDR, false discovery rate. d, number of detected effects. $\pi0$ the proportion 
 
 ### SRP of statistical tests simulated with known power
 
-```{r}
+```{r srp-simu}
 load("data/simu_out_100_1528906.RData")
 simu.out %>% 
   select(-fdr.power, -pi0.est) %>% 
@@ -230,46 +229,6 @@ simu.out %>%
 
 ```
 
-```{r, eval=FALSE, include=FALSE}
-# Simulate P values
-library(tidyverse)
-library(magrittr)
-simu_p_vals <- function(pi0, es, n) {
-  H1 <- replicate((1-pi0)*n, t.test(rnorm(6, es), mu=0)$p.value)
-  H0 <- replicate(pi0*n, t.test(rnorm(6, 0), mu=0)$p.value)
-  list(H0=H0, H1=H1)
-}
-reps <- 10
-pi0 <- c(0.5, 0.8, 0.9, 0.95)
-es <- c(1.9,2.4,2.7,3)
-parms <- expand.grid(pi0, es)
-colnames(parms) <- c("pi0set", "es")
-srp_simu <- sapply(parms, rep.int, times=reps) %>% as_data_frame()
-srp_simu %<>% 
-  mutate(pvalues = map2(pi0set, es, simu_p_vals, n=10000))
-```
-
-
-```{r SRP, eval=FALSE, include=FALSE}
-# Calculate SRP
-devtools::install_github("tpall/SRP")
-library(SRP)
-SRP <- srp_simu %>% mutate(SRP = map(pvalues, ~try(srp(unlist(.x)))))
-```
-
-
-```{r SRPvsTruePower, eval=FALSE, include=FALSE}
-load("data/SRPvsTruePower_simu.RData")
-ggplot(SRP, aes(Pow, SRP, color=factor(pi0set))) + 
-  geom_point() +
-  geom_smooth(method="lm") +
-  coord_fixed() +
-  xlab("True power (q<0.05)") +
-  ggtitle("SRP compared to true power") +
-  labs(color="Proportion\nof true H0") +
-  scale_color_colorblind()
-```
-
 ---
 
 class: inverse, center, middle
@@ -283,14 +242,7 @@ class: inverse, center, middle
 - GEO accepts next generation sequence data that examine quantitative gene expression, gene regulation, epigenomics or other aspects of functional genomics using methods such as RNA-seq, miRNA-seq, ChIP-seq, RIP-seq, HiC-seq, methyl-seq, etc
 
 ```{r geo-dynamics, fig.height=4}
-load("data/CopyOfGEO_RNA-seq-dynamics.RData")
-pdat <- ds %>% 
-  select(PDAT, PubMedIds) %>% 
-  mutate(pub=nchar(PubMedIds)!=0) %>% 
-  group_by(PDAT) %>% 
-  summarise(N = n(),
-            pub = sum(pub)) %>% 
-  mutate_at(vars(N, pub), cumsum)
+load("data/pdat_GEO_RNA-seq-dynamics.RData")
 pdat %<>% gather(key,value, -PDAT) 
 pdat %>% ggplot(aes(ymd(PDAT), value, linetype = key)) + 
   geom_line() +
@@ -343,31 +295,7 @@ suppfiles_of_interest <- suppfilenames %>%
 ### GEO Series with (potentially interesting) supplemental files
 
 ```{r suppfilesofinterest}
-load("data/suppfilenames_2017-04-01.RData")
-load("data/GEO_suppfiles_to_download.RData")
-load("data/GEO_retention.RData")
-suppf <- suppfilenames %>% unnest(SuppFileNames)
-suppf_downloaded <- suppf %>% filter(!str_detect(SuppFileNames, "time.*out|Server denied you to change"))
-out <- c("tar","gtf","bed","bigbed","bedgraph","bw","wig","hic","gct(x)?","tdf",        "gff","pdf","png","zip","sif","narrowpeak","gff3","fa")
-GEO_with_exp_summary <- suppf %>% filter(!str_detect(tolower(SuppFileNames), "filelist|error|readme|annotation|raw.tar$"))
-suppfiles_of_interest <- suppf %>%
-  filter(!str_detect(tolower(SuppFileNames), "filelist|error|readme|annotation|raw.tar$"),
-         !str_detect(tolower(SuppFileNames), paste0(out, "(.gz)?$", collapse = "|"))) %>%
-  select(Accession, SuppFileNames) %>%
-  mutate(filext = str_extract(tolower(SuppFileNames), "\\.[:alpha:]+([:punct:][bgz2]+)?$"))
-Count <- c(GEO_series_PDAT,
-           length(unique(suppf$Accession)),
-           length(unique(suppf_downloaded$Accession)),
-     length(unique(GEO_with_exp_summary$Accession)),
-     length(unique(suppfiles_of_interest$Accession)),
-     GEO_after_import)
-Step <- c('GEO Series, total',
-          'GEO with suppfile names',
-          'GEO with suppfile names\nsuccessfully downloaded',
-          'GEO with summary\nsuppfile name in any format',
-          'GEO with tabular experiment\nsummary suppfiles downloaded',
-          'GEO tables after import')
-
+load("data/suppfilesofinterest.RData")
 data_frame(Step, Count) %>%
   ggplot(aes(Step, Count, group = 1)) +
   # geom_bar(stat='identity') +
@@ -389,6 +317,7 @@ data_frame(Step, Count) %>%
 .pull-left[
 
 ```{r dims, results='asis'}
+load("data/GEO_retention.RData")
 dims %>%
   select(-excelfiles,-idcols) %>%
   filter(features>8000) %>%
@@ -430,11 +359,8 @@ Summary table, threshold of 8000 rows/features was used to calculate mean and me
 2. raw sequence read counts
 
 ```{r pvalues}
-load("data/pvalues.RData")
-pvalues <- tabs %>% filter(map_lgl(result, is.tibble))
-pvalues %>%
-  mutate(features = map_int(result, nrow)) %>%
-  ggplot(aes(features)) +
+load("data/pvalues_features.RData")  
+ggplot(pvalues, aes(features)) +
   geom_histogram(bins=30) +
   scale_x_log10() +
   geom_vline(xintercept = 8000, linetype = 3) +
@@ -450,12 +376,9 @@ Threshold of 8000 was used to identify full expressome P values sets.
 
 ### GEO Series with raw sequence read counts
 
-```{r counts, echo=TRUE}
-esets <- tabs %>% filter(map_chr(result, ~class(.x)[1])=="ExpressionSet")
-esets
-```
+![esets](figs/esets.png)
 
-`r length(unique(esets$Accession))` unique GEO Series
+96 unique GEO Series
 
 ---
 
@@ -552,7 +475,7 @@ P values are from likelihood ratio tests where full model formula was compared a
 
 ```{r srp-scatterplot}
 library(plotly)
-load("data/sparklines2.RData")
+load("data/sparklines2_plot-sparks.RData")
 p %>%
   ggplot(aes(pi0, SRP, color=id, label=str_extract(countfiles,"GSE[0-9]*"))) +
   geom_point() +
@@ -565,7 +488,7 @@ p %>%
 
 ### SRP versus library size
 
-```{r}
+```{r srp-libsize}
 load("data/countdata_libsize.RData")
 libsize <- countdata_libsize %>%
   group_by(countfiles, Accession) %>%

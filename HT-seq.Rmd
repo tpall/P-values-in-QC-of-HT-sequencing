@@ -7,67 +7,14 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align='center')
-library(tidyverse)
-library(lubridate)
-library(stringr)
-library(magrittr)
-library(reshape2)
-library(Biobase)
-library(ggthemes)
-library(gtable)
-library(grid)
-library(egg)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
-```{r libs}
-# Function to format numbers
-myround <- function(x, digits=1){
-    if(digits < 1)
-        stop("This is intended for the case digits >= 1.")
-
-    if(length(digits) > 1) {
-        digits <- digits[1]
-        warning("Using only digits[1]")
-    }
-
-    tmp <- sprintf(paste("%.", digits, "f", sep=""), x)
-
-    # deal with "-0.00" case
-    zero <- paste0("0.", paste(rep("0", digits), collapse=""))
-    tmp[tmp == paste0("-", zero)] <- zero
-
-    tmp
-}
-# Figure panel labels
-label <- lapply(LETTERS, textGrob, x = unit(0,"npc"), hjust = 0)
-```
-
-
-```{r munge-sparks}
-library(sparklines)
-library(formattable)
-load("data/sparklines2.RData")
-wrap_suppfile <- function(x, width = 50){
-  if(nchar(x) < width){return(x)}
-  
-  chrs <- unlist(strsplit(x, NULL))
-  nchrs <- length(chrs)
-  tosplit <- round(nchrs/width, 0)
-  
-  if(tosplit==1){ return(x)}
-  paste(c(paste(chrs[1:width], collapse = ""), paste(chrs[-(1:width)], collapse = "")), collapse="\n")
-}
-geolink <- "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc="
-p <-  data.frame(p, histograms = NA) %>% 
-  arrange(pi0, SRP) %>% 
-  rowwise() %>% 
-  mutate(countfiles = wrap_suppfile(countfiles, width = 40),
-         Accession = paste0("[",Accession,"](",geolink,Accession,")")) %>%
-  .[,c("Accession","countfiles","id","spark","histograms","SRP","pi0","rs","ud","fp")]
-```
 
 ```{r plot-sparks}
+library(sparklines)
+library(formattable)
+load("data/sparklines2_plot-sparks.RData")
 tab_coln <- c("Accession","Supplemental file","P values\norigin","P value\nhistogram","SRP", "pi0","Effects in\nreplication\nstudy","Undis\ncovered","FP")
 format_table(p, list(
   spark = FALSE,
