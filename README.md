@@ -1,17 +1,7 @@
-# P-values in quality control of high-throughput experiments
+# Tartu-Umea seminar June 6-8, 2017
 
-This is my talk presented on Apr-27, 2017 in seminar „P-väärtuse väärtus“
+## Simple and Scalable Quality Control of RNA Seq Experiments
 
-Biomeedikum, ruum 4061, Ravila 19, Tartu, Estonia
+- Introduction, Ülo Maiväli: Sissejuhatus_YM_2017.pptx
+- Results: https://tpall.github.io/P-values-in-QC-of-HT-sequencing
 
-- Ülo Maiväli, P tähendab Probability: mida me tegelikult teada tahame, kui võrdleme kahte gruppi. TÜ tehnoloogia instituut
-
-- Esa Läärä, P-väärtus -- habras tõenduse mõõt. Oulu ülikool, matemaatiliste teaduste uurimisüksus
-
-- Krista Fischer, P-väärtused ja suurandmed. TÜ geenivaramu
-
-- Taavi Päll, P-väärtused ja moodsa biomeditsiini kvaliteedikontroll. Tallinna tehnikaülikool, loodusteaduskond
-
-- Mait Raag, Kogemusi statistiliste testide õpetamisega arstiteaduskonnas. TÜ peremeditsiini ja rahvatervishoiu instituut
-
-Arutelu
