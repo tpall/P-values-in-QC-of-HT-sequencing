@@ -1,0 +1,58 @@
+---
+title: "P value histograms"
+author: "Taavi Päll"
+date: "8 6 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+```
+
+```{r load-data}
+library(tidyverse)
+library(magrittr)
+library(DT)
+library(sparkline)
+library(data.table)
+load("data/sparklines2.RData")
+wrap_suppfile <- function(x, width = 50){
+  if(nchar(x) < width){return(x)}
+  
+  chrs <- unlist(strsplit(x, NULL))
+  nchrs <- length(chrs)
+  tosplit <- round(nchrs/width, 0)
+  
+  if(tosplit==1){ return(x)}
+  paste(c(paste(chrs[1:width], collapse = ""), paste(chrs[-(1:width)], collapse = "")), collapse="\n")
+}
+
+p1 <- p %>% 
+  rowwise() %>% 
+  mutate_at("countfiles", wrap_suppfile, width = 40)
+p1 %<>%  ungroup %>% mutate(histogram = map(pvalue, ~hist(.x, plot=FALSE)$counts))
+p1 <- select(p1, Accession, countfiles, histogram, SRP, pi0, id)
+```
+
+
+```{r js}
+colDefs <- list(list(targets = 2, render = JS("function(data, type, full){ return '<span class=spark>' + data + '</span>' }")))
+bar_string <- "type: 'bar', barColor: 'orange', negBarColor: 'purple', highlightColor: 'black'"
+cb_bar = JS(paste0("function (oSettings, json) { $('.spark:not(:has(canvas))').sparkline('html', { ", bar_string, " }); }"), collapse = "")
+```
+
+
+```{r table}
+d <- datatable(data.table(p1), 
+               rownames = FALSE, 
+               options = list(columnDefs = colDefs, fnDrawCallback = cb_bar),
+               filter = "top",
+               caption = "Table 1. P value histograms, estimated pi0, and stable retrospective power 
+               (SRP). P values are from likelihood ratio tests where full model formula was compared
+               against intercept-only formula. SRP was calculated using FDR threshold of 0.05. pi0, 
+               the proportion of true null effects.")
+d$dependencies <- append(d$dependencies, htmlwidgets:::getDependency("sparkline"))
+d %>% 
+  formatRound(4:5, 2)
+```
+

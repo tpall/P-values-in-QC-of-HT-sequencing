@@ -3,7 +3,7 @@
   <head>
     <title>P-values in quality control of high-throughput experiments</title>
     <meta charset="utf-8">
-    <meta name="date" content="2017-04-27" />
+    <meta name="date" content="2017-06-08" />
     <link rel="stylesheet" href="bc.css" type="text/css" />
   </head>
   <body>
@@ -12,11 +12,10 @@ class: center, middle, inverse, title-slide
 
 # P-values in quality control of high-throughput experiments
 ### <p>Taavi Päll<br />
-PhD, lecturer<br />
 Institute of Chemistry and Biotechnology<br />
 Tallinn University of Technology<br />
 <a href="mailto:taavi.pall@ttu.ee">taavi.pall@ttu.ee</a></p>
-### 2017-04-27
+### 2017-06-08
 
 ---
 
@@ -26,155 +25,7 @@ Tallinn University of Technology<br />
 
 class: inverse, center, middle
 
-# Introduction
-
----
-
-### Poor reproducibility and replicability have become major concerns in experimental biomedical science
-
-![Reproducibility project](http://www.sciencemag.org/sites/default/files/styles/inline__699w__no_aspect/public/gg_70120NiD_CitationSankey_15245D6373E_2653219%3B3.png?itok=2OqRrpm3)
-
-.footnote[
-Image: [Rigorous replication effort succeeds for just two of five cancer papers](http://www.sciencemag.org/news/2017/01/rigorous-replication-effort-succeeds-just-two-five-cancer-papers)
-]
-
----
-
-### Reproducibility vs replication
-
-- Reproducibility is the ability of reproducing, by using the original data, the original data analysis exactly
-    - Reproducibility does not guarantee validity
-- Replicability is the ability of reproducing, by new experiments, the original data approximately
-    - Direct replication
-    - Conceptual replication
-
-.pull-left[
-&lt;center&gt;&lt;img src="http://www.mlslighting.co.uk/wp/wp-content/uploads/2015/02/lighting-calculation-1000.jpg" alt="reproduction" height="120"&gt;&lt;/center&gt;
-]
-
-.pull-right[
-&lt;center&gt;&lt;img src="http://www.artel-usa.com/wp-content/uploads/2013/09/pipetting-technique-1.jpg" alt="replication" height="120"&gt;&lt;/center&gt;
-]
-
-.footnote[
-Brian A Nosek, Timothy M Errington ["Reproducibility in cancer biology: Making sense of replications"](https://elife.elifesciences.org/content/6/e23383)
-]
-
-???
-
-- Poor reproducibility (the inability of reproducing, by using the original data, the original data analysis exactly) and 
-- replicability (the inability of reproducing, by new experiments, the original data approximately) have become major concerns in experimental biomedical science.
-
----
-
-### What is the quality of a study?
-
-- Whether it's worthwhile to replicate a study involves asking questions about the quality of this study
-- The potential usefulness and feasibility of a replication study can be estimated from the results of the original study
-- Standard approach -- The null hypothesis significance testing, deals with the quality of the experimental system in the long run rather than of the quality of a particular experiment, making it difficult to answer such questions
-
----
-
-### The null hypothesis significance testing (NHST) is for long run quality control
-
-- NHST controls specificity and sensitivity of the experimental system in the long-run
-- Specificity `\((\alpha)\)` is the false positive rate
-- Sensitivity `\((1-\beta)\)` is the statistical power of the test
-
-&lt;center&gt;&lt;img src="figs/nhst-explained.png" height="320"&gt;&lt;/center&gt;
-
----
-
-### Statistical power
-
-- Power equals the number of true effects (Ha) in the non-null bin divided by the number of true effects in both bins
-- When testing a single H0, which happens to be true, we cannot make any inference from the resultant P value, which by itself carries no useful information 
-- On the other hand, when the H0 is not true and our study is adequately powered, then the P value is likely to be close to zero
-&gt; If we perform experiment with predetermined statistical power, then small P value makes H0 less likely
-
-&lt;img src="index_files/figure-html/phistogram-1.svg" style="display: block; margin: auto;" /&gt;
-
-
-???
-
-- However, estimating statistical power can be biased 
-- Firstly, using meta-analysis of prior publications to determine the SD and ES for a prospective power study is likely to over-estimate the power 
-- because studies, whose ES happen to be inflated by sampling error or bias, tend to seem more interesting and are thus more likely to be published than the studies that happen to underestimate the ES (or even those that get their effects right) 
-- Such publication bias is pervasive in the biomedical literature
-
----
-
-### Proportion of true nulls can be estimated using the flat part of P value histogram
-
-- `\(\pi0\)` is the proportion of true null hypotheses
-- The q-value of a test is the proportion of false positives incurred when that particular test is called significant&lt;sup&gt;1&lt;/sup&gt;
-
-&lt;img src="index_files/figure-html/qvalues-1.svg" style="display: block; margin: auto;" /&gt;
-
-.footnote[
-[1] Q-value estimation for false discovery rate control [qvalue package](http://bioconductor.org/packages/release/bioc/html/qvalue.html) from bioconductor.org.
-]
-
----
-
-### Statistical power cannot be estimated after the experiment 
-
-&lt;img src="index_files/figure-html/post-hoc-power-1.svg" style="display: block; margin: auto;" /&gt;
-
-.footnote[
-- Because of random sampling post hoc statistical power is uncertain
-]
-
----
-
-class: inverse, center, middle
-
-# From prospective to retrospective quality control
-
----
-
-### Omics studies produce large numbers of P values from one study
-
-- In omics we study the responses of many mRNAs/proteins to the experimental condition, resulting in as many distinct P values 
-- These experiments are designed using the assumption that the relative levels of most mRNAs/proteins do not change upon experimental treatment
-
----
-
-### Stable retrospective power (SRP)
-
-- In the context of __many parallel measurements__ it is possible to assess the quality of a single experiment
-- SRP is the fraction of statistically significant true discoveries from all true discoveries (significant or not)
-
-$$ SRP = \frac{(1-FDR)\times d}{(1-\pi0)\times k}$$
-&gt; SRP can be calculated wherever there is a large family of parallel tests and FDR, `\(\pi0\)`, and q values are calculated
-
-.footnote[
-FDR, false discovery rate. d, number of detected effects. `\(\pi0\)` the proportion of true null effects. k, number of total tests. R package to calculate SRP [devtools::install_github("tpall/SRP")](https://github.com/tpall/SRP)
-]
-
-???
-
-- SRP can be calculated wherever there is a large family of parallel tests and FDR, `\(\pi0\)`, and q values are calculated
-
----
-
-### Difference between SRP and conventional statistical power
-
-- SRP combines the information present in a single test with the prior probability of the H0 (the `\(\pi0\)`), which is estimated laterally across hundreds or thousands of P values 
-- While traditional prospective power is used to set the sensitivity of the experimental system in the context of many consecutive measurements 
-&gt; SRP is used in the context of many parallel measurements to assess the quality of a single experiment
-
----
-
-### SRP of statistical tests simulated with known power
-
-&lt;img src="index_files/figure-html/srp-simu-1.svg" style="display: block; margin: auto;" /&gt;
-
----
-
-class: inverse, center, middle
-
-# Let's give SRP a field test
+# Let's test how SRP work in real life 
 
 ---
 
@@ -216,7 +67,7 @@ suppfiles_of_interest &lt;- suppfilenames %&gt;%
 
 - GEO Series published between Dec-24 2015 and Mar-31 2017
 - Keep only tables
-- Try to exclude single cell seq experiments (some will sneak through, as scientists are really inventive in file (mis)labeling), Chr-IP peak files, pdf, png, readmes etc.
+- Try to exclude single cell seq experiments (some will sneak through, as people are really inventive in file (mis)labeling), Chr-IP peak files, pdf, png, readmes etc.
 
 ---
 
@@ -266,8 +117,8 @@ Summary table, threshold of 8000 rows/features was used to calculate mean and me
 
 ### We were looking for supplemental files including tables with:
 
-1. raw P values
-2. raw sequence read counts
+1. Unadjusted raw P values
+2. Raw sequence read counts (not CPM, RPKM)
 
 &lt;img src="index_files/figure-html/pvalues-1.svg" style="display: block; margin: auto;" /&gt;
 
@@ -282,6 +133,10 @@ Threshold of 8000 was used to identify full expressome P values sets.
 ![esets](figs/esets.png)
 
 96 unique GEO Series
+
+---
+
+![recount2](figs/recount2-screen.png)
 
 ---
 
@@ -363,11 +218,29 @@ class: inverse, center, middle
 
 ---
 
+### Function to calculate srp
+
+
+```r
+devtools::install_github("tpall/SRP")
+library(SRP)
+pvals &lt;- runif(1000)
+out &lt;- try(srp(pvals))
+out
+```
+
+```
+##   SRP       pi0 fp rs       ud
+## 1   0 0.8794309  0  0 120.5691
+```
+
+
+---
 ### P value histograms, estimated pi0, and stable retrospective power
 
 ![SRP table](figs/SRP-table.png)
 
-[Click for full table](HT-seq.html)
+[Click for full table](pvalue-histograms.html)
 
 .footnote[
 P values are from likelihood ratio tests where full model formula was compared against intercept-only formula.
@@ -392,6 +265,8 @@ P values are from likelihood ratio tests where full model formula was compared a
 ### Acknowledgements
 
 - Ülo Maiväli and Tanel Tenson, _Institute of Technology, University of Tartu_
+- Read more about GEO RNA-seq project in [blog.credibleinterval.ee](https://blog.credibleinterval.ee)
+
 
 .footnote[
 email: taavi.pall@ttu.ee
@@ -401,7 +276,7 @@ email: taavi.pall@ttu.ee
 <script>var slideshow = remark.create({
 "highlightLines": true
 });
-if (window.HTMLWidgets) slideshow.on('showSlide', function (slide) {setTimeout(function() {window.dispatchEvent(new Event('resize'));}, 100)});</script>
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -415,7 +290,7 @@ MathJax.Hub.Config({
 (function () {
   var script = document.createElement('script');
   script.type = 'text/javascript';
-  script.src  = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
   if (location.protocol !== 'file:' && /^https?:/.test(script.src))
     script.src  = script.src.replace(/^https?:/, '');
   document.getElementsByTagName('head')[0].appendChild(script);
