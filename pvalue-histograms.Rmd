@@ -15,23 +15,7 @@ library(magrittr)
 library(DT)
 library(sparkline)
 library(data.table)
-load("data/sparklines2.RData")
-wrap_suppfile <- function(x, width = 50){
-  if(nchar(x) < width){return(x)}
-  
-  chrs <- unlist(strsplit(x, NULL))
-  nchrs <- length(chrs)
-  tosplit <- round(nchrs/width, 0)
-  
-  if(tosplit==1){ return(x)}
-  paste(c(paste(chrs[1:width], collapse = ""), paste(chrs[-(1:width)], collapse = "")), collapse="\n")
-}
-
-p1 <- p %>% 
-  rowwise() %>% 
-  mutate_at("countfiles", wrap_suppfile, width = 40)
-p1 %<>%  ungroup %>% mutate(histogram = map(pvalue, ~hist(.x, plot=FALSE)$counts))
-p1 <- select(p1, Accession, countfiles, histogram, SRP, pi0, id)
+load("data/p1_sparkline_table.RData")
 ```
 
 
